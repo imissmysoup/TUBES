@@ -6,6 +6,24 @@ using System.Collections.Generic;
 
 public class Matrix3x3
 {
+    public float GetScaleX() => MathF.Sqrt(M[0, 0] * M[0, 0] + M[1, 0] * M[1, 0]);
+	public float GetScaleY() => MathF.Sqrt(M[0, 1] * M[0, 1] + M[1, 1] * M[1, 1]);
+	public float GetRotation() => MathF.Atan2(M[1, 0], M[0, 0]);
+
+	// Invers matriks affine (untuk konversi layar -> dunia)
+	public Matrix3x3 Inverse()
+	{
+		float a = M[0, 0], b = M[0, 1], tx = M[0, 2];
+		float c = M[1, 0], d = M[1, 1], ty = M[1, 2];
+		float det = a * d - b * c;
+		if (det == 0f) return Identity();
+
+		float inv = 1.0f / det;
+		var r = new Matrix3x3();
+		r.M[0, 0] = d * inv;  r.M[0, 1] = -b * inv; r.M[0, 2] = (b * ty - d * tx) * inv;
+		r.M[1, 0] = -c * inv; r.M[1, 1] = a * inv;  r.M[1, 2] = (c * tx - a * ty) * inv;
+		return r;
+	}
     public float[,] M { get; private set; } = new float[3, 3];
 
     public Matrix3x3()

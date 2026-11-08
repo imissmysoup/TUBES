@@ -1,5 +1,7 @@
 {
   "DatasetPath": "res://Datasets/1966cbb279b58258eed0405669915734.json",
+  "MenuScenePath": "res://Scenes/MainMenu.tscn",
+  "SimulatorScenePath": "res://Scenes/MainSimulator.tscn",
   "DefaultWidth": 1280,
   "DefaultHeight": 720,
   "WallColorHex": "#FFFFFF",
@@ -21,9 +23,92 @@
   "SmokeBaseRy": 22.0,
   "SmokeExpansionRate": 0.25,
   "SmokeDriftSpeed": 12.0,
-  "SmokeWindAngleDeg": -30.0,
+  "SmokeWindAngleDeg": 70.0,
   "ActorRadius": 10.0,
   "ActorMoveSpeed": 1.8,
   "AlarmRadius": 16.0,
-  "AlarmRotationSpeedDeg": 180.0
+  "AlarmRotationSpeedDeg": 180.0,
+  "PixelSize": 2.0,
+  "ActorHeadingFactor": 1.8,
+  "ActorRotatesToHeading": true,
+  "ActorTurnSpeedDeg": 360.0,
+  "AgentStartDelay": 2.5,
+  "FireGrowthRate": 0.1,
+  "FireMaxScale": 2.0,
+  "FireRingCount": 3,
+  "SmokeStartDelay": 1.5,
+  "SmokeMaxScale": 2.5,
+  "AlarmActivationDelay": 1.0,
+  "AlarmPulseAmplitude": 0.25,
+  "AlarmPulseFrequency": 6.0,
+  "FireOrigin": {
+    "X": 3.0,
+    "Y": 2.8
+  },
+  "AlarmPositions": [
+    {
+      "X": 1.0,
+      "Y": 1.0
+    },
+    {
+      "X": 8.1,
+      "Y": 1.2
+    },
+    {
+      "X": 8.1,
+      "Y": 4.0
+    },
+    {
+      "X": 4.0,
+      "Y": 9.0
+    }
+  ],
+  "ActorAPath": [
+    {
+      "X": 4.0,
+      "Y": 9.5
+    },
+    {
+      "X": 7.6,
+      "Y": 12.3
+    },
+    {
+      "X": 9.2,
+      "Y": 12.3
+    },
+    {
+      "X": 9.2,
+      "Y": 14.0
+    }
+  ],
+  "ActorBPath": [
+    {
+      "X": 8.1,
+      "Y": 4.0
+    },
+    {
+      "X": 6.9,
+      "Y": 3.42
+    },
+    {
+      "X": 5.6,
+      "Y": 3.9
+    },
+    {
+      "X": 5.0,
+      "Y": 6.5
+    },
+    {
+      "X": 7.6,
+      "Y": 12.3
+    },
+    {
+      "X": 10.0,
+      "Y": 12.3
+    },
+    {
+      "X": 10.0,
+      "Y": 14.0
+    }
+  ]
 }

@@ -2,23 +2,38 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using EvacSimulator.Core;
+using EvacSimulator.Animation;
 using EvacSimulator.GraphicsEngine;
 using EvacSimulator.GraphicsEngine.Interfaces;
 using EvacSimulator.Controllers;
 
 [GlobalClass]
-public partial class FloorplanRenderer : Node2D
+public partial class FloorplanRenderer : Node2D, ISimulationControl
 {
 	public bool UseBresenham { get; private set; } = true;
 	public HUDCameraController CameraController { get; private set; } = new HUDCameraController();
+	public CompositeAnimator Animator { get; } = new CompositeAnimator();
 
 	private FloorplanModel _floorplan = new FloorplanModel();
 	private readonly ILineRenderer _ddaRenderer = new DDALine();
 	private readonly ILineRenderer _bresenhamRenderer = new BresenhamLine();
-	private readonly List<IAnimatable> _animatableObjects = new List<IAnimatable>();
 
 	private Color _wallColor = Colors.White;
 	private float _pixelSize = 2.0f;
+
+	public bool IsPlaying => Animator.IsPlaying;
+
+	public void TogglePlayPause()
+	{
+		if (Animator.IsPlaying) Animator.Pause();
+		else Animator.Play();
+	}
+
+	public void RestartSimulation()
+	{
+		Animator.Reset();
+		QueueRedraw();
+	}
 
 	public override void _Ready()
 	{
@@ -26,9 +41,21 @@ public partial class FloorplanRenderer : Node2D
 		var cfg = ConfigLoader.Config;
 
 		_wallColor = Color.FromHtml(cfg.WallColorHex);
+		_pixelSize = cfg.PixelSize;
 
 		_floorplan = DatasetParser.ParseHouseExpo(cfg.DatasetPath);
 		CameraController.Initialize(_floorplan.Center);
+
+		foreach (var obj in SimulationFactory.Build(cfg, new MidpointCircle(), new MidpointEllipse()))
+		{
+			Animator.Register(obj);
+		}
+		Animator.Play();
+		var hudLayer = new CanvasLayer();
+		AddChild(hudLayer);
+		var hud = new HudPanel();
+		hud.Init(this);
+		hudLayer.AddChild(hud);
 
 		GetTree().Root.SizeChanged += OnWindowSizeChanged;
 
@@ -40,6 +67,15 @@ public partial class FloorplanRenderer : Node2D
 		if (GetTree()?.Root != null)
 		{
 			GetTree().Root.SizeChanged -= OnWindowSizeChanged;
+		}
+	}
+
+	public override void _Process(double delta)
+	{
+		if (Animator.IsPlaying)
+		{
+			Animator.Update((float)delta);
+			QueueRedraw();
 		}
 	}
 
@@ -64,21 +100,27 @@ public partial class FloorplanRenderer : Node2D
 
 	public void RegisterAnimatable(IAnimatable animatable)
 	{
-		if (!_animatableObjects.Contains(animatable))
-		{
-			_animatableObjects.Add(animatable);
-			QueueRedraw();
-		}
+		Animator.Register(animatable);
+		QueueRedraw();
 	}
 
 	public void ClearAnimatables()
 	{
-		_animatableObjects.Clear();
+		Animator.Clear();
 		QueueRedraw();
 	}
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
+		// Debug: klik kanan untuk mencetak koordinat dunia (untuk menentukan jalur)
+		if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Right)
+		{
+			var inv = CameraController.GetViewMatrix(GetViewportRect().Size).Inverse();
+			Vector2 w = inv.TransformPoint(mb.Position);
+			GD.Print($"World: ({w.X:F2}, {w.Y:F2})");
+			return;
+		}
+
 		if (CameraController.HandleInput(@event))
 		{
 			QueueRedraw();
@@ -95,7 +137,7 @@ public partial class FloorplanRenderer : Node2D
 
 		DrawFloorplanWalls(viewMatrix, activeLineRenderer);
 
-		foreach (var animObj in _animatableObjects)
+		foreach (var animObj in Animator.Objects)
 		{
 			List<Vector2> pixels = animObj.GetRenderPixels(viewMatrix, activeLineRenderer);
 			Color objColor = animObj.GetRenderColor();
