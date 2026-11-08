@@ -19,7 +19,7 @@ public partial class FloorplanRenderer : Node2D, ISimulationControl
 	private readonly ILineRenderer _bresenhamRenderer = new BresenhamLine();
 
 	private Color _wallColor = Colors.White;
-	private float _pixelSize = 2.0f;
+	private float _pixelSize;
 
 	public bool IsPlaying => Animator.IsPlaying;
 
@@ -50,7 +50,14 @@ public partial class FloorplanRenderer : Node2D, ISimulationControl
 		{
 			Animator.Register(obj);
 		}
+		if (HasAnimation)
+		{
+		foreach (var obj in SimulationFactory.Build(cfg, new MidpointCircle(), new MidpointEllipse()))
+		{
+			Animator.Register(obj);
+		}
 		Animator.Play();
+		}
 		var hudLayer = new CanvasLayer();
 		AddChild(hudLayer);
 		var hud = new HudPanel();
@@ -176,5 +183,12 @@ public partial class FloorplanRenderer : Node2D, ISimulationControl
 		{
 			DrawRect(new Rect2(pt, rectSize), color);
 		}
+	}
+
+	public bool HasAnimation => AppState.Mode == SimulationMode.Simulation;
+
+	public void BackToMenu()
+	{
+		GetTree().ChangeSceneToFile(ConfigLoader.Config.MenuScenePath);
 	}
 }

@@ -7,4 +7,6 @@ public interface ISimulationControl
 	void ToggleLineAlgorithm();
 	void TogglePlayPause();
 	void RestartSimulation();
+	bool HasAnimation { get; }
+	void BackToMenu();
 }

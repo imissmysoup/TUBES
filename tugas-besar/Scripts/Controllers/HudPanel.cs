@@ -19,13 +19,20 @@ namespace EvacSimulator.Controllers
 			_algoButton.Pressed += () => { _sim.ToggleLineAlgorithm(); Refresh(); };
 			box.AddChild(_algoButton);
 
-			_playButton = new Button();
-			_playButton.Pressed += () => { _sim.TogglePlayPause(); Refresh(); };
-			box.AddChild(_playButton);
+			if (_sim.HasAnimation)
+			{
+				_playButton = new Button();
+				_playButton.Pressed += () => { _sim.TogglePlayPause(); Refresh(); };
+				box.AddChild(_playButton);
 
-			var restartButton = new Button { Text = "Restart" };
-			restartButton.Pressed += () => { _sim.RestartSimulation(); Refresh(); };
-			box.AddChild(restartButton);
+				var restartButton = new Button { Text = "Restart" };
+				restartButton.Pressed += () => { _sim.RestartSimulation(); Refresh(); };
+				box.AddChild(restartButton);
+			}
+
+			var backButton = new Button { Text = "Back to Main Menu" };
+			backButton.Pressed += () => _sim.BackToMenu();
+			box.AddChild(backButton);
 
 			Refresh();
 		}
@@ -33,7 +40,8 @@ namespace EvacSimulator.Controllers
 		private void Refresh()
 		{
 			_algoButton.Text = $"Garis: {_sim.GetActiveAlgorithmName()}";
-			_playButton.Text = _sim.IsPlaying ? "Pause" : "Play";
+			if (_playButton != null)
+				_playButton.Text = _sim.IsPlaying ? "Pause" : "Play";
 		}
 	}
 }
