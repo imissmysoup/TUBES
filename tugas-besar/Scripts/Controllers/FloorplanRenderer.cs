@@ -46,17 +46,13 @@ public partial class FloorplanRenderer : Node2D, ISimulationControl
 		_floorplan = DatasetParser.ParseHouseExpo(cfg.DatasetPath);
 		CameraController.Initialize(_floorplan.Center);
 
-		foreach (var obj in SimulationFactory.Build(cfg, new MidpointCircle(), new MidpointEllipse()))
-		{
-			Animator.Register(obj);
-		}
 		if (HasAnimation)
 		{
-		foreach (var obj in SimulationFactory.Build(cfg, new MidpointCircle(), new MidpointEllipse()))
-		{
-			Animator.Register(obj);
-		}
-		Animator.Play();
+			foreach (var obj in SimulationFactory.Build(cfg, new MidpointCircle(), new MidpointEllipse()))
+			{
+				Animator.Register(obj);
+			}
+			Animator.Play();
 		}
 		var hudLayer = new CanvasLayer();
 		AddChild(hudLayer);
